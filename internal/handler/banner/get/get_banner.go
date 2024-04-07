@@ -1,4 +1,4 @@
-package banner
+package get
 
 import (
 	"banner_service/internal/dto"
@@ -17,7 +17,7 @@ type QueryParams struct {
 }
 
 type BannerGetter interface {
-	GetBanner(banner *dto.GetBanner) (*dto.Banner, error)
+	Get(banner *dto.GetBanner) (*dto.Banner, error)
 }
 
 func New(log *slog.Logger, getter BannerGetter) http.HandlerFunc {
@@ -31,19 +31,21 @@ func New(log *slog.Logger, getter BannerGetter) http.HandlerFunc {
 			Offset:    queryParams.Offset,
 		}
 
-		banner, err := getter.GetBanner(getBannerDto)
+		banner, err := getter.Get(getBannerDto)
 		if err != nil {
-			log.Error("Error getting banner", err)
+			log.Error("Failed getting banner", "error", err)
 			render.JSON(w, r, response.InternalServerError("Failed getting banner"))
 
 			return
 		}
 		if banner == nil {
+			log.Error("Banner was not found", "error", err)
 			render.JSON(w, r, response.NotFound())
 
 			return
 		}
 
+		log.Info("Banner was gotten successfully", slog.Any("resp", banner))
 		render.JSON(w, r, response.Ok(banner))
 	}
 }
