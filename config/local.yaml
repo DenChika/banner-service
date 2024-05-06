@@ -1,0 +1,11 @@
+http_server:
+  host: "localhost"
+  port: 8080
+  timeout: 4s
+  idle_timeout: 60s
+db:
+  user: "psuser"
+  port: 5432
+  name: "bannersDb"
+  ssl: "disable"
+  driver: "postgres"
